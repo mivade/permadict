@@ -36,7 +36,6 @@ class Permadict(dict):
                 (key, pickle.dumps(value)))
 
     def close(self):
-        self.closed = True
         self.conn.close()
 
 
