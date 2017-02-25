@@ -1,31 +1,18 @@
 import sqlite3
 import pickle
-from contextlib import contextmanager
 
 
-@contextmanager
-def permadict(filename):
-    """Context manager interface to :class:`Dictionary`.
-
-    :param str filename:
-
-    """
-    d = Dictionary(filename)
-    yield d
-    d.close()
-
-
-class Dictionary(object):
+class Dictionary(dict):
     def __init__(self, filename):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
         self._create_table()
 
-    # def __enter__(self):
-    #     return self
+    def __enter__(self):
+        return self
 
-    # def __exit__(self, etype, evalue, etb):
-    #     self.close()
+    def __exit__(self, etype, evalue, etb):
+        self.close()
 
     def _create_table(self):
         with self.conn:
@@ -63,5 +50,5 @@ if __name__ == "__main__":
     d["wat"] = np.random.random((100,200))
     print(d["wat"])
 
-    with permadict("test.sqlite") as d:
+    with Dictionary("test.sqlite") as d:
         print(d["wat"])
