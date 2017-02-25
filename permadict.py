@@ -2,7 +2,7 @@ import sqlite3
 import pickle
 
 
-class Dictionary(dict):
+class Permadict(dict):
     def __init__(self, filename):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
@@ -43,12 +43,12 @@ class Dictionary(dict):
 if __name__ == "__main__":
     import numpy as np
 
-    d = Dictionary("test.sqlite")
+    d = Permadict("test.sqlite")
     d["thing"] = "whatever"
     print(d["thing"])
 
     d["wat"] = np.random.random((100,200))
     print(d["wat"])
 
-    with Dictionary("test.sqlite") as d:
-        print(d["wat"])
+    with Permadict("test.sqlite") as pd:
+        print(pd["wat"])
