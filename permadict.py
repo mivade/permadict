@@ -3,7 +3,7 @@ import pickle
 
 
 class Permadict(dict):
-    def __init__(self, filename):
+    def __init__(self, filename=":memory:"):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
         self._create_table()
@@ -35,6 +35,11 @@ class Permadict(dict):
                 "INSERT OR REPLACE INTO dict VALUES (?,?)",
                 (key, pickle.dumps(value)))
 
+    def keys(self):
+        with self.conn:
+            cur = self.conn.execute("SELECT name FROM dict")
+            return [key[0] for key in cur.fetchall()]
+
     def close(self):
         self.conn.close()
 
@@ -51,3 +56,7 @@ if __name__ == "__main__":
 
     with Permadict("test.sqlite") as pd:
         print(pd["wat"])
+
+    print(d.keys())
+
+    print(Permadict().keys())
