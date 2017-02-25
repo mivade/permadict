@@ -3,10 +3,14 @@ import pickle
 
 
 class Permadict(dict):
-    def __init__(self, filename=":memory:"):
+    def __init__(self, filename=":memory:", **kwargs):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
         self._create_table()
+
+        if len(kwargs) > 0:
+            for key, value in kwargs.items():
+                self[key] = value
 
     def __enter__(self):
         return self
@@ -19,6 +23,11 @@ class Permadict(dict):
             self.conn.execute(
                 "CREATE TABLE IF NOT EXISTS dict "
                 "(name TEXT PRIMARY KEY, object BLOB)")
+
+    def __len__(self):
+        with self.conn:
+            cur = self.conn.execute("SELECT COUNT(*) FROM dict")
+            return cur.fetchone()[0]
 
     def __getitem__(self, key):
         with self.conn:
@@ -60,3 +69,9 @@ if __name__ == "__main__":
     print(d.keys())
 
     print(Permadict().keys())
+
+    pd2 = Permadict(a=1, b=2, c=3)
+    for key in pd2.keys():
+        print(pd2[key])
+
+    print(len(pd2))
