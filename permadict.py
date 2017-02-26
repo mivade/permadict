@@ -2,7 +2,7 @@ import sqlite3
 import pickle
 
 
-class Permadict(dict):
+class Permadict(object):
     def __init__(self, filename=":memory:", **kwargs):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
