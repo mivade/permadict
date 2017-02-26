@@ -44,10 +44,25 @@ class Permadict(object):
                 "INSERT OR REPLACE INTO dict VALUES (?,?)",
                 (key, pickle.dumps(value)))
 
+    def __contains__(self, key):
+        try:
+            self[key]
+            return True
+        except KeyError:
+            return False
+
+    def __iter__(self):
+        for key in self.keys():
+            yield key
+
     def keys(self):
         with self.conn:
             cur = self.conn.execute("SELECT name FROM dict")
             return [key[0] for key in cur.fetchall()]
+
+    def items(self):
+        for key in self:
+            yield (key, self[key])
 
     def close(self):
         self.conn.close()

@@ -26,3 +26,25 @@ def test_keys():
     d = Permadict(key="value")
     assert len(list(d.keys())) is 1
     assert list(d.keys()) == ["key"]
+
+
+def test_in():
+    d = Permadict(key="value")
+    assert "key" in d
+    assert "nope" not in d
+
+
+def test_iterator():
+    d = Permadict(one=1, two=2)
+    x = [d[key] for key in d]
+    assert len(x) is 2
+    assert x == [1, 2]
+
+
+def test_items():
+    items = dict(a=1, b=2, c=3)
+    d = Permadict(**items)
+    for key, value in d.items():
+        assert key in items
+        assert key in d
+        assert items[key] == d[key]
