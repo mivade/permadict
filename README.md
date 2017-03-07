@@ -1,6 +1,14 @@
 # Permadict
 
-A trivial, persistent dictionary-like object, backed by SQLite.
+A trivial, persistent, dictionary-like object, backed by SQLite.
+
+## Installation
+
+```
+$ python setup.py install
+```
+
+Or just drop the `permadict.py` file into your package.
 
 ## Usage
 
