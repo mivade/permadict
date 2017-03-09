@@ -52,7 +52,7 @@ def test_iterator():
     d = Permadict(one=1, two=2)
     x = [d[key] for key in d]
     assert len(x) is 2
-    assert x == [1, 2]
+    assert sorted(x) == [1, 2]
 
 
 def test_items():
