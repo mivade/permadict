@@ -36,6 +36,22 @@ def test_set_and_get():
         print(d["nosuchkey"])
 
 
+def test_del():
+    d = Permadict()
+    d["one"] = 1
+    d["two"] = 2
+
+    assert len(d) == 2
+    assert d["one"] == 1
+    del d["one"]
+
+    with pytest.raises(KeyError):
+        d["one"]
+
+    assert d["two"] == 2
+    assert len(d) == 1
+
+
 def test_keys():
     d = Permadict(key="value")
     assert len(list(d.keys())) is 1

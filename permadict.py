@@ -44,6 +44,12 @@ class Permadict(object):
                 "INSERT OR REPLACE INTO dict VALUES (?,?)",
                 (key, pickle.dumps(value)))
 
+    def __delitem__(self, key):
+        if key not in self:
+            raise KeyError
+        with self.conn:
+            self.conn.execute("DELETE FROM dict WHERE name = (?)", (key,))
+
     def __contains__(self, key):
         try:
             self[key]
