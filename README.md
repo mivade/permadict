@@ -1,5 +1,7 @@
 # Permadict
 
+[![Build Status](https://travis-ci.org/mivade/permadict.svg?branch=master)](https://travis-ci.org/mivade/permadict)
+
 A trivial, persistent, dictionary-like object, backed by SQLite.
 
 ## Installation
