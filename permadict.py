@@ -68,7 +68,7 @@ class Permadict(object):
         self.conn.close()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import numpy as np
 
     d = Permadict("test.sqlite")

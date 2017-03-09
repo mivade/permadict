@@ -1,5 +1,19 @@
+from tempfile import gettempdir
+import os
+import os.path as osp
+import sqlite3
 import pytest
 from permadict import Permadict
+
+
+@pytest.fixture
+def db_filename():
+    filename = osp.join(gettempdir(), "database.sqlite")
+    yield filename
+    try:
+        os.remove(filename)
+    except:
+        pass
 
 
 def test_create():
@@ -48,3 +62,14 @@ def test_items():
         assert key in items
         assert key in d
         assert items[key] == d[key]
+
+
+def test_context(db_filename):
+    with Permadict(db_filename) as d:
+        d["key"] = "value"
+
+    with pytest.raises(sqlite3.ProgrammingError):
+        d["key"]
+
+    with Permadict(db_filename) as d:
+        assert d["key"] == "value"
