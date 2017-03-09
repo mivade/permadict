@@ -52,6 +52,17 @@ def test_del():
     assert len(d) == 1
 
 
+def test_clear():
+    d = Permadict()
+
+    d["one"] = 1
+    d["two"] = 2
+
+    assert len(d) is 2
+    d.clear()
+    assert len(d) is 0
+
+
 def test_keys():
     d = Permadict(key="value")
     assert len(list(d.keys())) is 1
@@ -78,6 +89,58 @@ def test_items():
         assert key in items
         assert key in d
         assert items[key] == d[key]
+
+
+def test_values():
+    values = [1, 2, 3]
+    items = {str(v): v for v in values}
+    d = Permadict(**items)
+    for v in d.values():
+        assert v in values
+
+
+def test_get():
+    d = Permadict(**dict(a=1, b=2, c=3))
+    value = d.get("a")
+    assert value == 1
+
+    value = d.get("nonexistant")
+    assert value is None
+
+    value = d.get("other", "one")
+    assert value == "one"
+
+
+def test_pop():
+    d = Permadict(**dict(a=1))
+    value = d.pop("a")
+    assert value == 1
+
+    with pytest.raises(KeyError):
+        d.pop("a")
+
+
+def test_updtae():
+    other = dict(one=1, two=2)
+    d = Permadict(**other)
+    assert len(d) is 2
+    assert d["one"] == 1
+    assert d["two"] == 2
+
+    d.update({"one": 3, "three": 1})
+    assert len(d) is 3
+    assert d["one"] == 3
+    assert d["two"] == 2
+    assert d["three"] == 1
+
+    pairs = [("one", 1), ("three", 3), ("four", 4)]
+    res = d.update(pairs)
+    assert res is None
+    assert len(d) is 4
+    assert d["one"] == 1
+    assert d["two"] == 2
+    assert d["three"] == 3
+    assert d["four"] == 4
 
 
 def test_context(db_filename):

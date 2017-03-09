@@ -50,10 +50,25 @@ something 1.2345
 something
 ```
 
+Deleting an item:
+
+```python
+>>> del d["something"]
+```
+
+Clearing all items:
+
+```python
+>>> d.clear()
+```
+
 ## Limitations
 
 Keys must be strings. Values are stored as `BLOB` type after being pickled, so
 your Python objects must be picklable.
+
+`Permadict` doesn't act entirely like a `dict`: some methods are missing,
+whether that be on purpose (as with `dict.copy`) or simply due to negligence.
 
 ## Motivation
 

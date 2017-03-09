@@ -70,6 +70,53 @@ class Permadict(object):
         for key in self:
             yield (key, self[key])
 
+    def values(self):
+        """Return an iterator of the :class:`Permadict`'s values."""
+        for key in self:
+            yield self[key]
+
+    def clear(self):
+        """Remove all items from the Peramdict."""
+        with self.conn:
+            self.conn.execute("DELETE FROM dict")
+
+    def get(self, key, default=None):
+        """Return the value for ``key`` if it exists, otherwise return the
+        ``default``.
+
+        """
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def pop(self, key):
+        """If ``key`` is present, remove it and return its value, else raise a
+        :class:`KeyError`.
+
+        """
+        try:
+            value = self[key]
+            del self[key]
+            return value
+        except KeyError:
+            raise
+
+    def update(self, iterable):
+        """Update the :class:`Permadict` with the key/value pairs of
+        ``iterable``.
+
+        Returns ``None``.
+
+        """
+        if isinstance(iterable, dict):
+            iter_ = iterable.items()
+        else:
+            iter_ = iterable
+        for key, value in iter_:
+            self[key] = value
+        return None
+
     def close(self):
         self.conn.close()
 
