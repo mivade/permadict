@@ -9,6 +9,7 @@ setup(
     version="1.0.0",
     author="Michael V. DePalatis",
     author_email="mike@depalatis.net",
+    url="https://github.com/mivade/permadict",
     description="A trivial, persistent, dictionary-like object, backed by SQLite.",
     long_description=README,
     license="Unlicense",
