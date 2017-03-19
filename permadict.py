@@ -23,6 +23,8 @@ class Permadict(object):
             self.conn.execute(
                 "CREATE TABLE IF NOT EXISTS dict "
                 "(name TEXT PRIMARY KEY, object BLOB)")
+            self.conn.execute(
+                "CREATE INDEX IF NOT EXISTS ix_name ON dict (name)")
 
     def __len__(self):
         with self.conn:

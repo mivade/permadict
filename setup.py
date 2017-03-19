@@ -6,7 +6,7 @@ with open("README.md") as f:
 
 setup(
     name="permadict",
-    version="1.0.0",
+    version="1.0.1",
     author="Michael V. DePalatis",
     author_email="mike@depalatis.net",
     url="https://github.com/mivade/permadict",
