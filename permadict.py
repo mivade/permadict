@@ -1,5 +1,10 @@
+import sys
 import sqlite3
-import pickle
+
+if sys.version_info[0] < 3:
+    import cPickle as pickle
+else:
+    import pickle
 
 
 class Permadict(object):
