@@ -1,7 +1,9 @@
 import sys
 import sqlite3
 
-if sys.version_info[0] < 3:
+PYVER = sys.version_info[0]
+
+if PYVER < 3:
     import cPickle as pickle
 else:
     import pickle
@@ -43,7 +45,8 @@ class Permadict(object):
             obj = cur.fetchone()
             if obj is None:
                 raise KeyError("No such key: " + key)
-            return pickle.loads(obj[0].encode())
+            key = str(obj[0]) if PYVER < 3 else obj[0]
+            return pickle.loads(key)
 
     def __setitem__(self, key, value):
         with self.conn:
