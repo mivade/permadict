@@ -43,7 +43,7 @@ class Permadict(object):
             obj = cur.fetchone()
             if obj is None:
                 raise KeyError("No such key: " + key)
-            return pickle.loads(obj[0])
+            return pickle.loads(obj[0].encode())
 
     def __setitem__(self, key, value):
         with self.conn:
