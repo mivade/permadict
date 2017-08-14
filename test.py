@@ -120,7 +120,7 @@ def test_pop():
         d.pop("a")
 
 
-def test_updtae():
+def test_update():
     other = dict(one=1, two=2)
     d = Permadict(**other)
     assert len(d) is 2
