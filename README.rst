@@ -1,7 +1,7 @@
 Permadict
 =========
 
-|Build Status|
+|Build Status| |Coverage|
 
 A trivial, persistent, dictionary-like object, backed by SQLite.
 
@@ -83,3 +83,6 @@ provides a safe way to do so. Also, why not?
 
 .. |Build Status| image:: https://travis-ci.org/mivade/permadict.svg?branch=master
    :target: https://travis-ci.org/mivade/permadict
+
+.. |Coverage| image:: https://codecov.io/gh/mivade/permadict/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/mivade/permadict
