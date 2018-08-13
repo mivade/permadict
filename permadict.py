@@ -139,7 +139,7 @@ if __name__ == "__main__":  # pragma: no cover
     d["thing"] = "whatever"
     print(d["thing"])
 
-    d["wat"] = np.random.random((100,200))
+    d["wat"] = np.random.random((100, 200))
     print(d["wat"])
 
     with Permadict("test.sqlite") as pd:

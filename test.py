@@ -12,7 +12,7 @@ def db_filename():
     yield filename
     try:
         os.remove(filename)
-    except:
+    except:  # noqa
         pass
 
 
