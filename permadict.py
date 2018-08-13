@@ -52,7 +52,8 @@ class Permadict(object):
         with self.conn:
             self.conn.execute(
                 "INSERT OR REPLACE INTO dict VALUES (?,?)",
-                (key, pickle.dumps(value)))
+                (key, pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),)
+            )
 
     def __delitem__(self, key):
         if key not in self:
