@@ -29,7 +29,7 @@ class Permadict(object):
         with self.conn:
             self.conn.execute(
                 "CREATE TABLE IF NOT EXISTS dict "
-                "(name TEXT PRIMARY KEY, object BLOB)")
+                "(name BLOB PRIMARY KEY, object BLOB)")
             self.conn.execute(
                 "CREATE INDEX IF NOT EXISTS ix_name ON dict (name)")
 
@@ -50,9 +50,9 @@ class Permadict(object):
 
     def __setitem__(self, key, value):
         with self.conn:
+            bin = sqlite3.Binary(pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL))
             self.conn.execute(
-                "INSERT OR REPLACE INTO dict VALUES (?,?)",
-                (key, pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL),)
+                "INSERT OR REPLACE INTO dict VALUES (?,?)", (key, bin)
             )
 
     def __delitem__(self, key):
