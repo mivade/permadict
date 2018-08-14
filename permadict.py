@@ -1,6 +1,7 @@
 from collections import MutableMapping
 import sys
 import sqlite3
+from textwrap import dedent
 
 PYVER = sys.version_info[0]
 
@@ -34,16 +35,17 @@ class Permadict(MutableMapping):
         self.close()
 
     def _create_table(self, wal):
+        sql = [
+            "CREATE TABLE IF NOT EXISTS dict (name BLOB PRIMARY KEY, object BLOB);",
+            "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);"
+        ]
+        if wal:
+            sql += ["PRAGMA journal_mode = WAL;"]
+
         with self.conn:
-            self.conn.execute(
-                "CREATE TABLE IF NOT EXISTS dict "
-                "(name BLOB PRIMARY KEY, object BLOB)"
-            )
-            self.conn.execute(
-                "CREATE INDEX IF NOT EXISTS ix_name ON dict (name)"
-            )
-            if wal:
-                self.conn.execute("PRAGMA journal_mode = WAL")
+            cursor = self.conn.cursor()
+            for statement in sql:
+                cursor.execute(statement)
 
     def __len__(self):
         with self.conn:
