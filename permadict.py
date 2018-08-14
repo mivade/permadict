@@ -1,3 +1,4 @@
+from collections import MutableMapping
 import sys
 import sqlite3
 
@@ -9,7 +10,7 @@ else:
     import pickle
 
 
-class Permadict(object):
+class Permadict(MutableMapping):
     def __init__(self, filename=":memory:", **kwargs):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
