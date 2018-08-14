@@ -69,7 +69,12 @@ Limitations
 -----------
 
 Keys must be strings. Values are stored as ``BLOB`` type after being
-pickled, so your Python objects must be picklable.
+pickled, so your Python objects must be picklable. Reading and writing speeds
+for large binary blobs are likely to be considerably slower than reading/writing
+directly to the filesystem, so ``Permadict`` shouldn't be used to store large
+Numpy arrays, for example. See here__ for more details.
+
+__ https://www.sqlite.org/intern-v-extern-blob.html
 
 ``Permadict`` doesn't act entirely like a ``dict``: some methods are
 missing, whether that be on purpose (as with ``dict.copy``) or simply
