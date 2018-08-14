@@ -82,7 +82,7 @@ class Permadict(object):
             yield (key, self[key])
 
     def values(self):
-        """Return an iterator of the :class:`Permadict`'s values."""
+        """A generator which iterates over the :class:`Permadict`'s values."""
         for key in self:
             yield self[key]
 
