@@ -11,10 +11,17 @@ else:
 
 
 class Permadict(MutableMapping):
-    def __init__(self, filename=":memory:", **kwargs):
+    """Persistent dict-like object backed by SQLite.
+
+    :param filename: path to database or ``:memory:`` (the default)
+    :param wal: when True (the default), set the journal mode to WAL
+    :param kwargs: keyword arguments to initialize keys and values with
+
+    """
+    def __init__(self, filename=":memory:", wal=True, **kwargs):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
-        self._create_table()
+        self._create_table(wal)
 
         if len(kwargs) > 0:
             for key, value in kwargs.items():
@@ -26,13 +33,17 @@ class Permadict(MutableMapping):
     def __exit__(self, etype, evalue, etb):
         self.close()
 
-    def _create_table(self):
+    def _create_table(self, wal):
         with self.conn:
             self.conn.execute(
                 "CREATE TABLE IF NOT EXISTS dict "
-                "(name BLOB PRIMARY KEY, object BLOB)")
+                "(name BLOB PRIMARY KEY, object BLOB)"
+            )
             self.conn.execute(
-                "CREATE INDEX IF NOT EXISTS ix_name ON dict (name)")
+                "CREATE INDEX IF NOT EXISTS ix_name ON dict (name)"
+            )
+            if wal:
+                self.conn.execute("PRAGMA journal_mode = WAL")
 
     def __len__(self):
         with self.conn:

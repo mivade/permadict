@@ -16,8 +16,9 @@ def db_filename():
         pass
 
 
-def test_create():
-    Permadict()
+@pytest.mark.parametrize("wal", [True, False])
+def test_create(wal):
+    Permadict(wal=wal)
     Permadict(key="value", otherkey=1)
     Permadict("test.sqlite")
 
