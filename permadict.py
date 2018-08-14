@@ -1,7 +1,6 @@
 from collections import MutableMapping
 import sys
 import sqlite3
-from textwrap import dedent
 
 PYVER = sys.version_info[0]
 
