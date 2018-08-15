@@ -16,11 +16,30 @@ def db_filename():
         pass
 
 
-@pytest.mark.parametrize("wal", [True, False])
-def test_create(wal):
-    Permadict(wal=wal)
+@pytest.mark.parametrize("wal,synchronous", [
+    (True, True),
+    (True, False),
+    (False, True),
+    (False, False),
+])
+def test_create(wal, synchronous, tmpdir):
+    Permadict(wal=wal, synchronous=synchronous)
     Permadict(key="value", otherkey=1)
-    Permadict("test.sqlite")
+
+    path = str(tmpdir.join("test.sqlite"))
+    db = Permadict(path, wal=wal, synchronous=synchronous)
+    cur = db.conn.cursor()
+
+    cur.execute("PRAGMA journal_mode")
+    mode = cur.fetchone()[0]
+    assert (mode.lower() == "wal") == wal
+
+    cur.execute("PRAGMA synchronous")
+    sync = cur.fetchone()[0]
+    if not synchronous:
+        assert sync == 0
+    else:
+        assert sync == 2  # default mode (FULL)
 
 
 def test_len():

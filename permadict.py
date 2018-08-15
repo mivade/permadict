@@ -15,13 +15,15 @@ class Permadict(MutableMapping):
 
     :param filename: path to database or ``:memory:`` (the default)
     :param wal: when True (the default), set the journal mode to WAL
+    :param synchronous: when False (the default), set ``PRAGMA synchronous = OFF``
     :param kwargs: keyword arguments to initialize keys and values with
 
     """
-    def __init__(self, filename=":memory:", wal=True, **kwargs):
+    def __init__(self, filename=":memory:", wal=True, synchronous=False,
+                 **kwargs):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
-        self._create_table(wal)
+        self._create_table(wal, synchronous)
 
         if len(kwargs) > 0:
             for key, value in kwargs.items():
@@ -33,11 +35,15 @@ class Permadict(MutableMapping):
     def __exit__(self, etype, evalue, etb):
         self.close()
 
-    def _create_table(self, wal):
+    def _create_table(self, wal, synchronous):
         sql = [
             "CREATE TABLE IF NOT EXISTS dict (name BLOB PRIMARY KEY, object BLOB);",
             "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);"
         ]
+
+        if not synchronous:
+            sql += ["PRAGMA synchronous = OFF;"]
+
         if wal:
             sql += ["PRAGMA journal_mode = WAL;"]
 
