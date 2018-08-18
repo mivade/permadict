@@ -1,4 +1,5 @@
 from collections import MutableMapping
+from contextlib import contextmanager
 import sys
 import sqlite3
 
@@ -35,6 +36,13 @@ class Permadict(MutableMapping):
     def __exit__(self, etype, evalue, etb):
         self.close()
 
+    @contextmanager
+    def cursor(self):
+        with self.conn:
+            cursor = self.conn.cursor()
+            yield cursor
+            cursor.close()
+
     def _create_table(self, wal, synchronous):
         sql = [
             "CREATE TABLE IF NOT EXISTS dict (name BLOB PRIMARY KEY, object BLOB);",
@@ -47,20 +55,18 @@ class Permadict(MutableMapping):
         if wal:
             sql += ["PRAGMA journal_mode = WAL;"]
 
-        with self.conn:
-            cursor = self.conn.cursor()
+        with self.cursor() as cursor:
             for statement in sql:
                 cursor.execute(statement)
 
     def __len__(self):
-        with self.conn:
+        with self.cursor() as cur:
             cur = self.conn.execute("SELECT COUNT(*) FROM dict")
             return cur.fetchone()[0]
 
     def __getitem__(self, key):
-        with self.conn:
-            cur = self.conn.execute(
-                "SELECT object FROM dict WHERE name = (?)", (key,))
+        with self.cursor() as cur:
+            cur.execute("SELECT object FROM dict WHERE name = (?)", (key,))
             obj = cur.fetchone()
             if obj is None:
                 raise KeyError("No such key: " + key)
@@ -68,17 +74,15 @@ class Permadict(MutableMapping):
             return pickle.loads(key)
 
     def __setitem__(self, key, value):
-        with self.conn:
+        with self.cursor() as cur:
             bin = sqlite3.Binary(pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL))
-            self.conn.execute(
-                "INSERT OR REPLACE INTO dict VALUES (?,?)", (key, bin)
-            )
+            cur.execute("INSERT OR REPLACE INTO dict VALUES (?,?)", (key, bin))
 
     def __delitem__(self, key):
         if key not in self:
             raise KeyError
-        with self.conn:
-            self.conn.execute("DELETE FROM dict WHERE name = (?)", (key,))
+        with self.cursor() as cur:
+            cur.execute("DELETE FROM dict WHERE name = (?)", (key,))
 
     def __contains__(self, key):
         try:
@@ -92,8 +96,8 @@ class Permadict(MutableMapping):
             yield key
 
     def keys(self):
-        with self.conn:
-            cur = self.conn.execute("SELECT name FROM dict")
+        with self.cursor() as cur:
+            cur.execute("SELECT name FROM dict")
             return [key[0] for key in cur.fetchall()]
 
     def items(self):
@@ -107,8 +111,8 @@ class Permadict(MutableMapping):
 
     def clear(self):
         """Remove all items from the Peramdict."""
-        with self.conn:
-            self.conn.execute("DELETE FROM dict")
+        with self.cursor() as cur:
+            cur.execute("DELETE FROM dict")
 
     def get(self, key, default=None):
         """Return the value for ``key`` if it exists, otherwise return the
