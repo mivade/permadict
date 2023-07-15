@@ -1,14 +1,7 @@
-from collections import MutableMapping
+from collections.abc import MutableMapping
 from contextlib import contextmanager
-import sys
+import pickle
 import sqlite3
-
-PYVER = sys.version_info[0]
-
-if PYVER < 3:
-    import cPickle as pickle
-else:
-    import pickle
 
 
 class Permadict(MutableMapping):
@@ -68,7 +61,7 @@ class Permadict(MutableMapping):
             obj = cur.fetchone()
             if obj is None:
                 raise KeyError("No such key: " + key)
-            key = str(obj[0]) if PYVER < 3 else obj[0]
+            key = obj[0]
             return pickle.loads(key)
 
     def __setitem__(self, key, value):
