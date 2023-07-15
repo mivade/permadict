@@ -1,5 +1,6 @@
-from collections.abc import MutableMapping
+from collections.abc import Iterable, Iterator, MutableMapping
 from contextlib import contextmanager
+from typing import Any
 import pickle
 import sqlite3
 
@@ -13,8 +14,14 @@ class Permadict(MutableMapping):
     :param kwargs: keyword arguments to initialize keys and values with
 
     """
-    def __init__(self, filename=":memory:", journal_mode="OFF",
-                 synchronous=False, **kwargs):
+
+    def __init__(
+        self,
+        filename: str = ":memory:",
+        journal_mode: str = "OFF",
+        synchronous: bool = False,
+        **kwargs: Any
+    ):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
         self._create_table(journal_mode, synchronous)
@@ -36,10 +43,10 @@ class Permadict(MutableMapping):
             yield cursor
             cursor.close()
 
-    def _create_table(self, journal_mode, synchronous):
+    def _create_table(self, journal_mode: str, synchronous: bool) -> None:
         sql = [
             "CREATE TABLE IF NOT EXISTS dict (name BLOB PRIMARY KEY, object BLOB);",
-            "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);"
+            "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);",
         ]
 
         if not synchronous:
@@ -50,62 +57,61 @@ class Permadict(MutableMapping):
             for statement in sql:
                 cursor.execute(statement)
 
-    def __len__(self):
+    def __len__(self) -> int:
         with self.cursor() as cur:
             cur = self.conn.execute("SELECT COUNT(*) FROM dict")
             return cur.fetchone()[0]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         with self.cursor() as cur:
             cur.execute("SELECT object FROM dict WHERE name = (?)", (key,))
             obj = cur.fetchone()
             if obj is None:
                 raise KeyError("No such key: " + key)
-            key = obj[0]
-            return pickle.loads(key)
+            return pickle.loads(obj[0])
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         with self.cursor() as cur:
             bin = sqlite3.Binary(pickle.dumps(value, protocol=pickle.HIGHEST_PROTOCOL))
             cur.execute("INSERT OR REPLACE INTO dict VALUES (?,?)", (key, bin))
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         if key not in self:
             raise KeyError
         with self.cursor() as cur:
             cur.execute("DELETE FROM dict WHERE name = (?)", (key,))
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         try:
             self[key]
             return True
         except KeyError:
             return False
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         for key in self.keys():
             yield key
 
-    def keys(self):
+    def keys(self) -> Iterator[str]:
         with self.cursor() as cur:
             cur.execute("SELECT name FROM dict")
-            return [key[0] for key in cur.fetchall()]
+            return (key[0] for key in cur.fetchall())
 
-    def items(self):
+    def items(self) -> Iterator[tuple[str, Any]]:
         for key in self:
             yield (key, self[key])
 
-    def values(self):
+    def values(self) -> Iterator[Any]:
         """A generator which iterates over the :class:`Permadict`'s values."""
         for key in self:
             yield self[key]
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all items from the Peramdict."""
         with self.cursor() as cur:
             cur.execute("DELETE FROM dict")
 
-    def get(self, key, default=None):
+    def get(self, key: str, default: Any = None):
         """Return the value for ``key`` if it exists, otherwise return the
         ``default``.
 
@@ -115,7 +121,7 @@ class Permadict(MutableMapping):
         except KeyError:
             return default
 
-    def pop(self, key):
+    def pop(self, key: str) -> Any:
         """If ``key`` is present, remove it and return its value, else raise a
         :class:`KeyError`.
 
@@ -127,7 +133,7 @@ class Permadict(MutableMapping):
         except KeyError:
             raise
 
-    def update(self, iterable):
+    def update(self, iterable: Iterable):
         """Update the :class:`Permadict` with the key/value pairs of
         ``iterable``.
 
@@ -142,7 +148,7 @@ class Permadict(MutableMapping):
             self[key] = value
         return None
 
-    def close(self):
+    def close(self) -> None:
         self.conn.close()
 
 

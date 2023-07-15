@@ -22,6 +22,6 @@ setup(
         "License :: Public Domain",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Topic :: Database"
-    ]
+        "Topic :: Database",
+    ],
 )
