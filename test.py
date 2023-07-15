@@ -16,12 +16,15 @@ def db_filename():
         pass
 
 
-@pytest.mark.parametrize("journal_mode,synchronous", [
-    ("WAL", True),
-    ("WAL", False),
-    ("OFF", True),
-    ("OFF", False),
-])
+@pytest.mark.parametrize(
+    "journal_mode,synchronous",
+    [
+        ("WAL", True),
+        ("WAL", False),
+        ("OFF", True),
+        ("OFF", False),
+    ],
+)
 def test_create(journal_mode, synchronous, tmpdir):
     Permadict(journal_mode=journal_mode, synchronous=synchronous)
     Permadict(key="value", otherkey=1)

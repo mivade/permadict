@@ -13,8 +13,10 @@ class Permadict(MutableMapping):
     :param kwargs: keyword arguments to initialize keys and values with
 
     """
-    def __init__(self, filename=":memory:", journal_mode="OFF",
-                 synchronous=False, **kwargs):
+
+    def __init__(
+        self, filename=":memory:", journal_mode="OFF", synchronous=False, **kwargs
+    ):
         self.filename = filename
         self.conn = sqlite3.connect(self.filename)
         self._create_table(journal_mode, synchronous)
@@ -39,7 +41,7 @@ class Permadict(MutableMapping):
     def _create_table(self, journal_mode, synchronous):
         sql = [
             "CREATE TABLE IF NOT EXISTS dict (name BLOB PRIMARY KEY, object BLOB);",
-            "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);"
+            "CREATE INDEX IF NOT EXISTS ix_name ON dict (name);",
         ]
 
         if not synchronous:
